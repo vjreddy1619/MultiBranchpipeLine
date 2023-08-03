@@ -1,31 +1,41 @@
+@Library('mylib')_
 pipeline{
     agent any
     stages{
-        stage('ContinuousDownload'){
+        stage('ContinouosDownload_Master'){
             steps{
-                git 'https://github.com/intelliqittrainings/maven.git'
+                script{
+                    cicd.gitDownload("maven")
+                }
             }
         }
-        stage('ContinuousBuild'){
+        stage('ContinouosBuild_Master'){
             steps{
-                sh 'mvn package'
+                script{
+                    cicd.mavenBuild()
+                }
             }
         }
-        stage('ContinuousDeployment'){
+        stage('ContinouosDeployment_Master'){
             steps{
-                deploy adapters: [tomcat9(credentialsId: '2a78b56c-ab70-4db6-b92f-ca1eb4d7b8fb', path: '', url: 'http://172.31.86.188:8080')], contextPath: 'mytestapp', war: '**/*.war'
+                script{
+                    cicd.tomcatDeployment("DeclarativePipelineWithSharedLibrary","172.31.86.188","testapp")
+                }
             }
         }
-        stage('ContinuousTesting'){
+        stage('ContinouosTesting_Master'){
             steps{
-                git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
-                sh 'java -jar /var/lib/jenkins/workspace/DeclarativePipeline1/testing.jar'
+                script{
+                    cicd.gitDownload("FunctionalTesting")
+                    cicd.runSeleinium("DeclarativePipelineWithSharedLibrary")
+                }
             }
         }
-        stage('ContinuousDelivery'){
+        stage('ContinouosDelivery_Master'){
             steps{
-                input message: 'waiting for approval of DM', submitter: 'kanna'
-                deploy adapters: [tomcat9(credentialsId: '2a78b56c-ab70-4db6-b92f-ca1eb4d7b8fb', path: '', url: 'http://172.31.88.251:8080')], contextPath: 'myprodapp', war: '**/*.war'
+                script{
+                    cicd.tomcatDeployment("DeclarativePipelineWithSharedLibrary","172.31.88.251","prodapp")
+                }
             }
         }
     }
