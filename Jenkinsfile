@@ -2,41 +2,20 @@
 pipeline{
     agent any
     stages{
-        stage('ContinouosDownload_Master'){
+        stage('ContinouosDownload_Loans'){
             steps{
                 script{
                     cicd.gitDownload("maven")
                 }
             }
         }
-        stage('ContinouosBuild_Master'){
+        stage('ContinouosBuild_Loans'){
             steps{
                 script{
                     cicd.mavenBuild()
                 }
             }
         }
-        stage('ContinouosDeployment_Master'){
-            steps{
-                script{
-                    cicd.tomcatDeployment("DeclarativePipelineWithSharedLibrary","172.31.86.188","testapp")
-                }
-            }
-        }
-        stage('ContinouosTesting_Master'){
-            steps{
-                script{
-                    cicd.gitDownload("FunctionalTesting")
-                    cicd.runSeleinium("DeclarativePipelineWithSharedLibrary")
-                }
-            }
-        }
-        stage('ContinouosDelivery_Master'){
-            steps{
-                script{
-                    cicd.tomcatDeployment("DeclarativePipelineWithSharedLibrary","172.31.88.251","prodapp")
-                }
-            }
-        }
+        
     }
 }
